@@ -1,426 +1,270 @@
-/* ===================================================================
- * Infinity - Main JS
- *
- * ------------------------------------------------------------------- */ 
+/*---------------------------------------------------------------------------------
+/*
+/* Main JS
+/*
+-----------------------------------------------------------------------------------*/  
 
 (function($) {
 
 	"use strict";
 
-	var cfg = {		
-		defAnimation   : "fadeInUp",    // default css animation		
-		scrollDuration : 800,           // smoothscroll duration
-		mailChimpURL   : 'http://facebook.us8.list-manage.com/subscribe/post?u=cdb7b577e41181934ed6a6a44&amp;id=e65110b38d'
-	},	
-
-	$WIN = $(window);
-	
-
-   // Add the User Agent to the <html>
-   // will be used for IE10 detection (Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0))
-	var doc = document.documentElement;
-	doc.setAttribute('data-useragent', navigator.userAgent);
-
-	
-	/* Preloader 
-	 * -------------------------------------------------- */
-	var ssPreloader = function() {
-
-		$WIN.on('load', function() {	
-
-			// force page scroll position to top at page refresh
-			$('html, body').animate({ scrollTop: 0 }, 'normal');
-
-	      // will first fade out the loading animation 
-	    	$("#loader").fadeOut("slow", function(){
-
-	        // will fade out the whole DIV that covers the website.
-	        $("#preloader").delay(300).fadeOut("slow");
-
-	      }); 
-	  	});
-	}; 
-
-
-	/* FitVids
+	/*---------------------------------------------------- */
+	/* Preloader
 	------------------------------------------------------ */ 
-	var ssFitVids = function() {
-		$(".fluid-video-wrapper").fitVids();
-	}; 
+   $(window).load(function() {
+
+      // will first fade out the loading animation 
+    	$("#loader").fadeOut("slow", function(){
+
+        // will fade out the whole DIV that covers the website.
+        $("#preloader").delay(300).fadeOut("slow");
+
+      });       
+
+  	})
 
 
-	/*	Masonry
-	------------------------------------------------------ */
-	var ssMasonryFolio = function() {
+  	/*----------------------------------------------------*/
+  	/* Flexslider
+  	/*----------------------------------------------------*/
+  	$(window).load(function() {
 
-		var containerBricks = $('.bricks-wrapper');
-
-		containerBricks.imagesLoaded( function() {
-			containerBricks.masonry( {	
-			  	itemSelector: '.brick',
-			  	resize: true
-			});
-		});
-	};
-
-
-	/*	Light Gallery
-	------------------------------------------------------- */
-	var ssLightGallery = function() {
-
-		$('#folio-wrap').lightGallery({  
-			showThumbByDefault: false,
-			hash: false,
-			selector: ".item-wrap"		
-		});
-	};
-
-
-	/* Flexslider
-  	* ------------------------------------------------------ */
-  	var ssFlexSlider = function() {
-
-  		$WIN.on('load', function() {
-
-		   $('#testimonial-slider').flexslider({
-		   	namespace: "flex-",
-		      controlsContainer: "",
-		      animation: 'slide',
-		      controlNav: true,
-		      directionNav: false,
-		      smoothHeight: true,
-		      slideshowSpeed: 7000,
-		      animationSpeed: 600,
-		      randomize: false,
-		      touch: true,
-		   });
-
+	  	$('#hero-slider').flexslider({
+	   	namespace: "flex-",
+	      controlsContainer: ".hero-container",
+	      animation: 'fade',
+	      controlNav: true,
+	      directionNav: false,
+	      smoothHeight: true,
+	      slideshowSpeed: 7000,
+	      animationSpeed: 600,
+	      randomize: false,
+	      before: function(slider){
+			   $(slider).find(".animated").each(function(){
+			   	$(this).removeAttr("class");
+			  	});			  	
+			},
+			start: function(slider){
+			   $(slider).find(".flex-active-slide")
+			           	.find("h1").addClass("animated fadeInDown show")
+			           	.next().addClass("animated fadeInUp show");
+			           		
+			   $(window).trigger('resize');		  			 
+			},
+			after: function(slider){
+			 	$(slider).find(".flex-active-slide")
+			           	.find("h1").addClass("animated fadeInDown show")
+			           	.next().addClass("animated fadeInUp show");			  
+			}
 	   });
 
-  	};
+	   $('#testimonial-slider').flexslider({
+	   	namespace: "flex-",
+	      controlsContainer: "",
+	      animation: 'slide',
+	      controlNav: true,
+	      directionNav: false,
+	      smoothHeight: true,
+	      slideshowSpeed: 7000,
+	      animationSpeed: 600,
+	      randomize: false,
+	   });
+
+   });
 
 
-  	/* Carousel
-	* ------------------------------------------------------ */
-	var ssOwlCarousel = function() {
+   /*----------------------------------------------------*/
+	/* Adjust Primary Navigation Background Opacity
+	------------------------------------------------------*/
+   $(window).on('scroll', function() {
 
-		$(".owl-carousel").owlCarousel({		
-	      nav: false,
-			loop: true,
-	    	margin: 50,
-	    	responsiveClass:true,
-	    	responsive: {
-	         0:{
-	            items:2,
-	            margin: 20
-	         },
-	         400:{
-	            items:3,
-	            margin: 30
-	         },
-	         600:{
-	            items:4,
-	            margin: 40
-	         },
-	         1000:{
-	            items:6            
-	         }
-	    	}
-		});
+		var h = $('header').height();
+		var y = $(window).scrollTop();
+      var header = $('#main-header');
 
-	};
-  	
+	   if ((y > h + 30 ) && ($(window).outerWidth() > 768 ) ) {
+	      header.addClass('opaque');	      
+	   }
+      else {
+         if (y < h + 30) {
+            header.removeClass('opaque');
+         }
+         else {
+            header.addClass('opaque');
+         }
+      }
+
+	});
 
 
-  	/* Menu on Scrolldown
-	 * ------------------------------------------------------ */
-	var ssMenuOnScrolldown = function() {
+   /*----------------------------------------------------*/
+  	/* Highlight the current section in the navigation bar
+  	------------------------------------------------------*/
+	var sections = $("section"),
+	navigation_links = $("#nav-wrap a");	
 
-		var menuTrigger = $('#header-menu-trigger');
+	sections.waypoint( {
 
-		$WIN.on('scroll', function() {
+       handler: function(direction) {
 
-			if ($WIN.scrollTop() > 150) {				
-				menuTrigger.addClass('opaque');
-			}
-			else {				
-				menuTrigger.removeClass('opaque');
-			}
+		   var active_section;
 
-		}); 
-	};
+			active_section = $('section#' + this.element.id);
 
-	
-  	/* OffCanvas Menu
-	 * ------------------------------------------------------ */
-   var ssOffCanvas = function() {
+			if (direction === "up") active_section = active_section.prev();
 
-	       var menuTrigger = $('#header-menu-trigger'),
-	       nav             = $('#menu-nav-wrap'),
-	       closeButton     = nav.find('.close-button'),
-	       siteBody        = $('body'),
-	       mainContents    = $('section, footer');
+			var active_link = $('#nav-wrap a[href="#' + active_section.attr("id") + '"]');			
 
-		// open-close menu by clicking on the menu icon
-		menuTrigger.on('click', function(e){
-			e.preventDefault();
-			menuTrigger.toggleClass('is-clicked');
-			siteBody.toggleClass('menu-is-open');
-		});
+         navigation_links.parent().removeClass("current");
+			active_link.parent().addClass("current");
 
-		// close menu by clicking the close button
-		closeButton.on('click', function(e){
-			e.preventDefault();
-			menuTrigger.trigger('click');	
-		});
+		}, 
 
-		// close menu clicking outside the menu itself
-		siteBody.on('click', function(e){		
-			if( !$(e.target).is('#menu-nav-wrap, #header-menu-trigger, #header-menu-trigger span') ) {
-				menuTrigger.removeClass('is-clicked');
-				siteBody.removeClass('menu-is-open');
-			}
-		});
+		offset: '25%'
 
-   };
+	});
 
 
-  /* Smooth Scrolling
-	* ------------------------------------------------------ */
-	var ssSmoothScroll = function() {
+   /*----------------------------------------------------*/
+  	/* FitText Settings
+  	------------------------------------------------------ */
+  	setTimeout(function() {
 
-		$('.smoothscroll').on('click', function (e) {
-			var target = this.hash,
-			$target    = $(target);
+   	$('#hero-slider h1').fitText(1, { minFontSize: '30px', maxFontSize: '49px' });
+
+  	}, 100);
+
+
+  	/*-----------------------------------------------------*/
+  	/* Mobile Menu
+   ------------------------------------------------------ */  
+   var menu_icon = $("<span class='menu-icon'>Menu</span>");
+  	var toggle_button = $("<a>", {                         
+                        id: "toggle-btn", 
+                        html : "",
+                        title: "Menu",
+                        href : "#" } 
+                        );
+  	var nav_wrap = $('nav#nav-wrap')
+  	var nav = $("ul#nav");  
+   
+   /* if JS is enabled, remove the two a.mobile-btns 
+  	and dynamically prepend a.toggle-btn to #nav-wrap */
+  	nav_wrap.find('a.mobile-btn').remove(); 
+  	toggle_button.append(menu_icon); 
+   nav_wrap.prepend(toggle_button); 
+
+  	toggle_button.on("click", function(e) {
+   	e.preventDefault();
+    	nav.slideToggle("fast");     
+  	});
+
+  	if (toggle_button.is(':visible')) nav.addClass('mobile');
+  	$(window).resize(function() {
+   	if (toggle_button.is(':visible')) nav.addClass('mobile');
+    	else nav.removeClass('mobile');
+  	});
+
+  	$('ul#nav li a').on("click", function() {      
+   	if (nav.hasClass('mobile')) nav.fadeOut('fast');      
+  	});
+
+
+  	/*----------------------------------------------------*/
+  	/* Smooth Scrolling
+  	------------------------------------------------------ */
+  	$('.smoothscroll').on('click', function (e) {
 	 	
-		 	e.preventDefault();
-		 	e.stopPropagation();	   	
+	 	e.preventDefault();
 
-	    	$('html, body').stop().animate({
-	       	'scrollTop': $target.offset().top
-	      }, cfg.scrollDuration, 'swing').promise().done(function () {
+   	var target = this.hash,
+    	$target = $(target);
 
-	      	// check if menu is open
-	      	if ($('body').hasClass('menu-is-open')) {
-					$('#header-menu-trigger').trigger('click');
-				}
+    	$('html, body').stop().animate({
+       	'scrollTop': $target.offset().top
+      }, 800, 'swing', function () {
+      	window.location.hash = target;
+      });
 
-	      	window.location.hash = target;
-	      });
-	  	});
-
-	};
-
-
-  /* Placeholder Plugin Settings
-	* ------------------------------------------------------ */
-	var ssPlaceholder = function() {
-		$('input, textarea, select').placeholder();  
-	};
-
-
-  	/* Alert Boxes
-  	------------------------------------------------------- */
-  	var ssAlertBoxes = function() {
-
-  		$('.alert-box').on('click', '.close', function() {
-		  $(this).parent().fadeOut(500);
-		}); 
-
-  	};	  	
-	
-
-  /* Animations
-	* ------------------------------------------------------- */
-	var ssAnimations = function() {
-
-		if (!$("html").hasClass('no-cssanimations')) {
-			$('.animate-this').waypoint({
-				handler: function(direction) {
-
-					var defAnimationEfx = cfg.defAnimation;
-
-					if ( direction === 'down' && !$(this.element).hasClass('animated')) {
-						$(this.element).addClass('item-animate');
-
-						setTimeout(function() {
-							$('body .animate-this.item-animate').each(function(ctr) {
-								var el       = $(this),
-								animationEfx = el.data('animate') || null;	
-
-	                  	if (!animationEfx) {
-			                 	animationEfx = defAnimationEfx;	                 	
-			               }
-
-			              	setTimeout( function () {
-									el.addClass(animationEfx + ' animated');
-									el.removeClass('item-animate');
-								}, ctr * 30);
-
-							});								
-						}, 100);
-					}
-
-					// trigger once only
-	       		this.destroy(); 
-				}, 
-				offset: '95%'
-			}); 
-		}
-
-	};
-	
-
-  /* Intro Animation
-	* ------------------------------------------------------- */
-	var ssIntroAnimation = function() {
-
-		$WIN.on('load', function() {
-		
-	     	if (!$("html").hasClass('no-cssanimations')) {
-	     		setTimeout(function(){
-	    			$('.animate-intro').each(function(ctr) {
-						var el = $(this),
-	                   animationEfx = el.data('animate') || null;		                                      
-
-	               if (!animationEfx) {
-	                 	animationEfx = cfg.defAnimation;	                 	
-	               }
-
-	              	setTimeout( function () {
-							el.addClass(animationEfx + ' animated');
-						}, ctr * 300);
-					});						
-				}, 100);
-	     	} 
-		}); 
-
-	};
-
-
-  /* Contact Form
-   * ------------------------------------------------------ */
-   var ssContactForm = function() {   	
-
-   	/* local validation */   	
-		$('#contactForm').validate({
-
-			/* submit via ajax */
-			submitHandler: function(form) {				
-				var sLoader = $('#submit-loader');			
-
-				$.ajax({   	
-			      type: "POST",
-			      url: "inc/sendEmail.php",
-			      data: $(form).serialize(),
-
-			      beforeSend: function() { 
-			      	sLoader.fadeIn(); 
-			      },
-			      success: function(msg) {
-		            // Message was sent
-		            if (msg == 'OK') {
-		            	sLoader.fadeOut(); 
-		               $('#message-warning').hide();
-		               $('#contactForm').fadeOut();
-		               $('#message-success').fadeIn();   
-		            }
-		            // There was an error
-		            else {
-		            	sLoader.fadeOut(); 
-		               $('#message-warning').html(msg);
-			            $('#message-warning').fadeIn();
-		            }
-			      },
-			      error: function() {
-			      	sLoader.fadeOut(); 
-			      	$('#message-warning').html("Something went wrong. Please try again.");
-			         $('#message-warning').fadeIn();
-			      }
-		      });    		
-	  		}
-
-		});
-   };	
-
-
-  /* AjaxChimp
-	* ------------------------------------------------------ */
-	var ssAjaxChimp = function() {
-
-		$('#mc-form').ajaxChimp({
-			language: 'es',
-		   url: cfg.mailChimpURL
-		});
-
-		// Mailchimp translation
-		//
-		//  Defaults:
-		//	 'submit': 'Submitting...',
-		//  0: 'We have sent you a confirmation email',
-		//  1: 'Please enter a value',
-		//  2: 'An email address must contain a single @',
-		//  3: 'The domain portion of the email address is invalid (the portion after the @: )',
-		//  4: 'The username portion of the email address is invalid (the portion before the @: )',
-		//  5: 'This email address looks fake or invalid. Please enter a real email address'
-
-		$.ajaxChimp.translations.es = {
-		  'submit': 'Submitting...',
-		  0: '<i class="fa fa-check"></i> We have sent you a confirmation email',
-		  1: '<i class="fa fa-warning"></i> You must enter a valid e-mail address.',
-		  2: '<i class="fa fa-warning"></i> E-mail address is not valid.',
-		  3: '<i class="fa fa-warning"></i> E-mail address is not valid.',
-		  4: '<i class="fa fa-warning"></i> E-mail address is not valid.',
-		  5: '<i class="fa fa-warning"></i> E-mail address is not valid.'
-		} 
-
-	};
-
- 
-  /* Back to Top
-	* ------------------------------------------------------ */
-	var ssBackToTop = function() {
-
-		var pxShow  = 500,         // height on which the button will show
-		fadeInTime  = 400,         // how slow/fast you want the button to show
-		fadeOutTime = 400,         // how slow/fast you want the button to hide
-		scrollSpeed = 300,         // how slow/fast you want the button to scroll to top. can be a value, 'slow', 'normal' or 'fast'
-		goTopButton = $("#go-top")
-
-		// Show or hide the sticky footer button
-		$(window).on('scroll', function() {
-			if ($(window).scrollTop() >= pxShow) {
-				goTopButton.fadeIn(fadeInTime);
-			} else {
-				goTopButton.fadeOut(fadeOutTime);
-			}
-		});
-	};	
-
-
+  	});  
   
-  /* Initialize
-	* ------------------------------------------------------ */
-	(function ssInit() {
 
-		ssPreloader();
-		ssFitVids();
-		ssMasonryFolio();
-		ssLightGallery();
-		ssFlexSlider();
-		ssOwlCarousel();
-		ssMenuOnScrolldown();
-		ssOffCanvas();
-		ssSmoothScroll();
-		ssPlaceholder();
-		ssAlertBoxes();
-		ssAnimations();
-		ssIntroAnimation();		
-		ssContactForm();
-		ssAjaxChimp();
-		ssBackToTop();
+   /*----------------------------------------------------*/
+	/*	Modal Popup
+	------------------------------------------------------*/
+    $('.item-wrap a').magnificPopup({
 
-	})();
- 
+       type:'inline',
+       fixedContentPos: false,
+       removalDelay: 300,
+       showCloseBtn: false,
+       mainClass: 'mfp-fade'
+
+    });
+
+    $(document).on('click', '.popup-modal-dismiss', function (e) {
+    		e.preventDefault();
+    		$.magnificPopup.close();
+    });
+
+
+   /*----------------------------------------------------*/
+	/*  Placeholder Plugin Settings
+	------------------------------------------------------ */  	 
+	$('input, textarea').placeholder()  
+
+   
+	/*----------------------------------------------------*/
+	/*	contact form
+	------------------------------------------------------*/
+
+	/* local validation */
+	$('#contactForm').validate({
+
+		/* submit via ajax */
+		submitHandler: function(form) {
+
+			var sLoader = $('#submit-loader');
+
+			$.ajax({      	
+
+		      type: "POST",
+		      url: "inc/sendEmail.php",
+		      data: $(form).serialize(),
+		      beforeSend: function() { 
+
+		      	sLoader.fadeIn(); 
+
+		      },
+		      success: function(msg) {
+
+	            // Message was sent
+	            if (msg == 'OK') {
+	            	sLoader.fadeOut(); 
+	               $('#message-warning').hide();
+	               $('#contactForm').fadeOut();
+	               $('#message-success').fadeIn();   
+	            }
+	            // There was an error
+	            else {
+	            	sLoader.fadeOut(); 
+	               $('#message-warning').html(msg);
+		            $('#message-warning').fadeIn();
+	            }
+
+		      },
+		      error: function() {
+
+		      	sLoader.fadeOut(); 
+		      	$('#message-warning').html("Something went wrong. Please try again.");
+		         $('#message-warning').fadeIn();
+
+		      }
+
+	      });     		
+  		}
+
+	});
+	
 
 })(jQuery);
